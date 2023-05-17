@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Dp
 
 import androidx.compose.ui.unit.dp
@@ -41,43 +42,75 @@ fun TextTabRow(
                 )
             }
         }
-//        val scrollState = rememberScrollState()
 
-
-    Layout(
-        contents = listOf(textTabs,indicator2),
-        modifier = Modifier
-    ){
-            (textTabsMeasures,indicatorMeasures2),constraints->
-
-        val indicatorplaceable2 = indicatorMeasures2.first().measure(constraints)
-
-        val textTabsplaceables = textTabsMeasures.map {
-            val placeable = it.measure(constraints)
-            placeable
-        }
-
-        val totalHeight = 56.dp.roundToPx()
-        val totalWidth =300.dp.roundToPx()
-
-        layout(totalWidth, totalHeight){
-//            indicatorplaceable.place(0,0)
-//            textTabsplaceable.place(0,0)
-            val iw = indicatorplaceable2.width
-            val ih = indicatorplaceable2.height
-            indicatorplaceable2.place(totalWidth-iw,totalHeight-ih)
+        SubcomposeLayout(){
+            constraints ->
+            var textTabsplaceables = subcompose("textTabs",textTabs).map {
+                val placeable = it.measure(constraints)
+                placeable
+            }
 
             var left = 0
             var tabPositions = mutableListOf<TabPosition>()
             textTabsplaceables.forEach{
-                it.placeRelative(left,0)
                 tabPositions.add(TabPosition(left.toDp(),it.width.toDp()))
                 left+=it.width
             }
 
+            val indicatorPlaceable = subcompose("indicator"){
+                indicator(tabPositions)
+            }.map { it.measure(constraints.copy(minWidth = 0)) }
 
+            val totalHeight = 56.dp.roundToPx()
+            val totalWidth =300.dp.roundToPx()
+
+            layout(totalWidth, totalHeight){
+                var tleft = 0
+                textTabsplaceables.forEach{
+                    it.placeRelative(tleft,0)
+                    tleft+=it.width
+                }
+
+                indicatorPlaceable.forEach {
+                    it.placeRelative(0, 0)
+                }
+            }
         }
-    }
+
+//    Layout(
+//        contents = listOf(textTabs,indicator2),
+//        modifier = Modifier
+//    ){
+//            (textTabsMeasures,indicatorMeasures2),constraints->
+//
+//        val indicatorplaceable2 = indicatorMeasures2.first().measure(constraints)
+//
+//        val textTabsplaceables = textTabsMeasures.map {
+//            val placeable = it.measure(constraints)
+//            placeable
+//        }
+//
+//        val totalHeight = 56.dp.roundToPx()
+//        val totalWidth =300.dp.roundToPx()
+//
+//        layout(totalWidth, totalHeight){
+////            indicatorplaceable.place(0,0)
+////            textTabsplaceable.place(0,0)
+//            val iw = indicatorplaceable2.width
+//            val ih = indicatorplaceable2.height
+//            indicatorplaceable2.place(totalWidth-iw,totalHeight-ih)
+//
+//            var left = 0
+//            var tabPositions = mutableListOf<TabPosition>()
+//            textTabsplaceables.forEach{
+//                it.placeRelative(left,0)
+//                tabPositions.add(TabPosition(left.toDp(),it.width.toDp()))
+//                left+=it.width
+//            }
+//
+//
+//        }
+//    }
 
     }
 

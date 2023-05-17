@@ -1,6 +1,10 @@
 package com.example.myapplication
 
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
@@ -9,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -145,16 +150,29 @@ fun TextTabIndicator(
     tabPositions: List<TabPosition>,
     currentScreen: TextDestination
 ) {
+//    val indicatorLeft = tabPositions[currentScreen.ordinal].left
+//    val indicatorRight = tabPositions[currentScreen.ordinal].right
+
+    val transition = updateTransition(currentScreen, label = "Tab indicator")
+    val indicatorLeft by transition.animateDp(transitionSpec = { spring(stiffness = Spring.StiffnessVeryLow)}, label = "Indicator left") { page ->
+        tabPositions[page.ordinal].left
+    }
+    val indicatorRight by transition.animateDp(transitionSpec = { spring(stiffness = Spring.StiffnessVeryLow)}, label = "Indicator right") { page ->
+        tabPositions[page.ordinal].right
+    }
+
     Box(
         modifier = Modifier
 //            .fillMaxSize()
             .wrapContentWidth(Alignment.Start)
-            .size(50.dp)
+            .height(50.dp)
+            .offset(x = indicatorLeft)
+            .width(indicatorRight - indicatorLeft)
 //            .background(Color.Transparent)
             .border(2.dp, Color.Red),
         contentAlignment = Alignment.BottomEnd,
     ) {
-        Text(text = "Test", color = Color.Black)
+//        Text(text = "Test", color = Color.Black)
     }
 }
 
