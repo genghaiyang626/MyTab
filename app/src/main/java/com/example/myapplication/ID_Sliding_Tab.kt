@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -164,7 +165,7 @@ fun TextTabIndicator(
     Box(
         modifier = Modifier
 //            .fillMaxSize()
-            .wrapContentWidth(Alignment.Start)
+//            .wrapContentWidth(Alignment.Start)
             .height(50.dp)
             .offset(x = indicatorLeft)
             .width(indicatorRight - indicatorLeft)

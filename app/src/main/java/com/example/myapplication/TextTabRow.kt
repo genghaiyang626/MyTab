@@ -1,4 +1,7 @@
 package com.example.myapplication
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -15,6 +18,7 @@ import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 
 import androidx.compose.ui.unit.dp
@@ -28,11 +32,17 @@ fun TextTabRow(
     indicator:@Composable (tabPositions: List<TabPosition>) -> Unit ={},
     indicator2:@Composable () -> Unit ={},
 ) {
+    val scrollState = rememberScrollState()
+
     Surface(
         color = Color.White,
-        contentColor = Color.Yellow
+        contentColor = Color.Yellow,
+        modifier = Modifier
+            .scrollable(scrollState,Orientation.Horizontal, reverseDirection = true)
+//            .width(300.dp)
+//            .height(56.dp)
     ) {
-//        val indicatorBox = @Composable{ it:List<TabPosition> -> indicator(it)}
+
         val textTabs = @Composable{
             allScreens.forEach { screen ->
                 TextTab(
@@ -46,7 +56,7 @@ fun TextTabRow(
         SubcomposeLayout(){
             constraints ->
             var textTabsplaceables = subcompose("textTabs",textTabs).map {
-                val placeable = it.measure(constraints)
+                val placeable = it.measure(constraints)//.copy(maxWidth = Constraints.Infinity)
                 placeable
             }
 
@@ -62,17 +72,22 @@ fun TextTabRow(
             }.map { it.measure(constraints.copy(minWidth = 0)) }
 
             val totalHeight = 56.dp.roundToPx()
-            val totalWidth =300.dp.roundToPx()
+            val totalWidth = 300.dp.roundToPx() // left.coerceAtMost(300.dp.roundToPx())
 
             layout(totalWidth, totalHeight){
+                // 根据可滚动的距离来计算滚动位置
+                val scroll = scrollState.value.coerceIn(0, left-totalWidth)
+                // 根据滚动位置得到实际组件偏移量
+                val xOffset = -scroll
+
                 var tleft = 0
                 textTabsplaceables.forEach{
-                    it.placeRelative(tleft,0)
+                    it.placeRelative(tleft+xOffset,0)
                     tleft+=it.width
                 }
 
                 indicatorPlaceable.forEach {
-                    it.placeRelative(0, 0)
+                    it.placeRelative(xOffset, 0)
                 }
             }
         }
