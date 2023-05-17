@@ -19,6 +19,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TabRow
 
 import androidx.compose.material3.Text
 
@@ -56,16 +57,12 @@ fun Id_sliding_tab(modifier: Modifier=Modifier){
     Scaffold(
         topBar = {
             TextTabRow(
-                textTabs = {
-                    TextTabs(
-                        allScreens = TextTabRowScreens,
-                        onTabSelected = { newScreen ->
-                            navController
-                                .navigateSingleTopTo(newScreen.route)
-                        },
-                        currentScreen = currentScreen
-                    )
+                allScreens = TextTabRowScreens,
+                onTabSelected = { newScreen ->
+                    navController
+                        .navigateSingleTopTo(newScreen.route)
                 },
+                currentScreen =currentScreen,
                 indicator = { tabPositions -> TextTabIndicator(tabPositions,currentScreen) },
                 indicator2 = { TextTabIndicator2() }
             )
@@ -128,32 +125,6 @@ fun TextTabs(
                 .selectableGroup()
                 .background(color = Color.Transparent)
                 .width(TabWidth2)
-                .scrollable(scrollState, Orientation.Horizontal, reverseDirection = true)
-                .layout { measurable, constraints ->
-                    // 约束中默认最大宽度为父组件所允许的最大宽度，此处为屏幕宽度
-                    // 将最大宽度设置为无限大
-                    val childConstraints = constraints.copy(
-                        maxWidth = Constraints.Infinity
-                    )
-                    // 使用新的约束进行组件测量
-                    val placeable = measurable.measure(childConstraints)
-                    // 计算当前组件宽度与父组件所允许的最大宽度中取一个最小值
-                    // 如果组件超出屏幕，此时width为屏幕宽度。如果没有超出，则为组件本文宽度
-                    val width = placeable.width.coerceAtMost(constraints.maxWidth)
-                    // 计算当前组件高度与父组件所允许的最大高度中取一个最小值
-                    val height = placeable.height.coerceAtMost(constraints.maxHeight)
-                    // 计算可滚动的距离
-                    val scrollDistance = placeable.width - width
-                    // 主动设置组件的宽高
-                    layout(width, height) {
-                        // 根据可滚动的距离来计算滚动位置
-                        val scroll = scrollState.value.coerceIn(0, scrollDistance)
-                        // 根据滚动位置得到实际组件偏移量
-                        val xOffset = -scroll
-                        // 对组件内容完成布局
-                        placeable.placeRelativeWithLayer(xOffset, 0)
-                    }
-                }
         ) {
             allScreens.forEach { screen ->
                 TextTab(
@@ -161,7 +132,9 @@ fun TextTabs(
                     onSelected = { onTabSelected(screen) },
                     selected = currentScreen == screen
                 )
-
+//                TabRow(selectedTabIndex = ) {
+//
+//                }
             }
         }
     }
