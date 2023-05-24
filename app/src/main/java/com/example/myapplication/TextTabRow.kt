@@ -1,29 +1,18 @@
 package com.example.myapplication
+import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-//import androidx.compose.material3.ScrollableTabData
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalComposeUiApi::class)
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun TextTabRow(
     allScreens: List<TextDestination>,
@@ -32,6 +21,7 @@ fun TextTabRow(
     indicator:@Composable (tabPositions: List<TabPosition>) -> Unit ={},
     indicator2:@Composable () -> Unit ={},
 ) {
+
     val scrollState = rememberScrollState()
 
     Surface(
@@ -39,10 +29,7 @@ fun TextTabRow(
         contentColor = Color.Yellow,
         modifier = Modifier
             .scrollable(scrollState,Orientation.Horizontal, reverseDirection = true)
-//            .width(300.dp)
-//            .height(56.dp)
     ) {
-
         val textTabs = @Composable{
             allScreens.forEach { screen ->
                 TextTab(
@@ -55,13 +42,13 @@ fun TextTabRow(
 
         SubcomposeLayout(){
             constraints ->
-            var textTabsplaceables = subcompose("textTabs",textTabs).map {
+            val textTabsplaceables = subcompose("textTabs",textTabs).map {
                 val placeable = it.measure(constraints)//.copy(maxWidth = Constraints.Infinity)
                 placeable
             }
 
             var left = 0
-            var tabPositions = mutableListOf<TabPosition>()
+            val tabPositions = mutableListOf<TabPosition>()
             textTabsplaceables.forEach{
                 tabPositions.add(TabPosition(left.toDp(),it.width.toDp()))
                 left+=it.width
@@ -71,65 +58,51 @@ fun TextTabRow(
                 indicator(tabPositions)
             }.map { it.measure(constraints.copy(minWidth = 0)) }
 
+            val indicator2Placeable = subcompose("indicator2",indicator2).map {
+                val placeable = it.measure(constraints.copy(minWidth = 0))
+                placeable
+            }
+
             val totalHeight = 56.dp.roundToPx()
             val totalWidth = 300.dp.roundToPx() // left.coerceAtMost(300.dp.roundToPx())
+            val paddingWidth = 10.dp.roundToPx()
+
+            var xOffset = 0
+            //居中
+//            xOffset = if(tabPositions[currentScreen.ordinal].left < 150.dp){
+//                -scroll
+//            }else if (tabPositions[currentScreen.ordinal].left.roundToPx() <= 200 +paddingWidth ){
+//                150- tabPositions[currentScreen.ordinal].left.roundToPx()
+//            }else{
+//                -scroll
+//            }
+
+            // 根据可滚动的距离来计算滚动位置
+            val scroll = scrollState.value.coerceIn(0, left-totalWidth+paddingWidth*2)
+            // 根据滚动位置得到实际组件偏移量
+             xOffset = -scroll
 
             layout(totalWidth, totalHeight){
-                // 根据可滚动的距离来计算滚动位置
-                val scroll = scrollState.value.coerceIn(0, left-totalWidth)
-                // 根据滚动位置得到实际组件偏移量
-                val xOffset = -scroll
 
-                var tleft = 0
+                indicatorPlaceable.forEach {
+                    it.placeRelative(paddingWidth+xOffset, 0)
+                }
+
+                var tleft = paddingWidth
                 textTabsplaceables.forEach{
                     it.placeRelative(tleft+xOffset,0)
                     tleft+=it.width
                 }
 
-                indicatorPlaceable.forEach {
-                    it.placeRelative(xOffset, 0)
+                indicator2Placeable.forEach {
+                    it.placeRelative(totalWidth-it.width, 0)
                 }
             }
         }
-
-//    Layout(
-//        contents = listOf(textTabs,indicator2),
-//        modifier = Modifier
-//    ){
-//            (textTabsMeasures,indicatorMeasures2),constraints->
-//
-//        val indicatorplaceable2 = indicatorMeasures2.first().measure(constraints)
-//
-//        val textTabsplaceables = textTabsMeasures.map {
-//            val placeable = it.measure(constraints)
-//            placeable
-//        }
-//
-//        val totalHeight = 56.dp.roundToPx()
-//        val totalWidth =300.dp.roundToPx()
-//
-//        layout(totalWidth, totalHeight){
-////            indicatorplaceable.place(0,0)
-////            textTabsplaceable.place(0,0)
-//            val iw = indicatorplaceable2.width
-//            val ih = indicatorplaceable2.height
-//            indicatorplaceable2.place(totalWidth-iw,totalHeight-ih)
-//
-//            var left = 0
-//            var tabPositions = mutableListOf<TabPosition>()
-//            textTabsplaceables.forEach{
-//                it.placeRelative(left,0)
-//                tabPositions.add(TabPosition(left.toDp(),it.width.toDp()))
-//                left+=it.width
-//            }
-//
-//
-//        }
-//    }
-
     }
 
 }
+
 
 @Immutable
 class TabPosition internal constructor(val left: Dp, val width: Dp) {

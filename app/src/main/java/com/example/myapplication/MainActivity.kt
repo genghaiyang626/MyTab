@@ -40,16 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = LightSlateGray,
-                    contentColor = LightSlateGray
-                ) {
-//                    Greeting("Android")
-//                    MyButton()
                     Id_sliding_tab()
-                }
             }
         }
     }

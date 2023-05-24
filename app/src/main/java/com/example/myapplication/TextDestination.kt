@@ -3,6 +3,10 @@ package com.example.myapplication
 interface TextDestination {
     val route: String
     val ordinal: Int
+
+    companion object {
+         var old_route:Int = 0
+    }
 }
 
 //private val YourTextData = listOf(

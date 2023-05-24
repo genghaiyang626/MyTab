@@ -7,39 +7,23 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
-
 import androidx.compose.material3.ExperimentalMaterial3Api
-
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TabRow
-
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-
-
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
-
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
@@ -70,9 +54,10 @@ fun Id_sliding_tab(modifier: Modifier=Modifier){
                 },
                 currentScreen =currentScreen,
                 indicator = { tabPositions -> TextTabIndicator(tabPositions,currentScreen) },
-                indicator2 = { TextTabIndicator2() }
+                indicator2 = { TextTabIndicator2() },
             )
-        }
+        },
+        containerColor = Color.White,
     
     ) { innerPadding ->
          NavHost(
@@ -103,9 +88,6 @@ fun Id_sliding_tab(modifier: Modifier=Modifier){
              }
              composable(route = Comic.route) {
                  Chosenes4()
-//                 TabRow(selectedTabIndex = ) {
-//
-//                 }
              }
          }
      }
@@ -113,60 +95,38 @@ fun Id_sliding_tab(modifier: Modifier=Modifier){
 }
 
 @Composable
-fun TextTabs(
-    allScreens: List<TextDestination>,
-    onTabSelected: (TextDestination) -> Unit,
-    currentScreen: TextDestination
-) {
-    val scrollState = rememberScrollState()
-    Box(
-        Modifier
-            .width(TabWidth2)
-            .height(TabHeight2)
-            .background(Color.Transparent),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            modifier = Modifier
-                .selectableGroup()
-                .background(color = Color.Transparent)
-                .width(TabWidth2)
-        ) {
-            allScreens.forEach { screen ->
-                TextTab(
-                    text = screen.route,
-                    onSelected = { onTabSelected(screen) },
-                    selected = currentScreen == screen
-                )
-//                TabRow(selectedTabIndex = ) {
-//
-//                }
-            }
-        }
-    }
-}
-
-@Composable
 fun TextTabIndicator(
     tabPositions: List<TabPosition>,
     currentScreen: TextDestination
 ) {
-//    val indicatorLeft = tabPositions[currentScreen.ordinal].left
-//    val indicatorRight = tabPositions[currentScreen.ordinal].right
-
+    val ans:Boolean = currentScreen.ordinal > TextDestination.old_route
     val transition = updateTransition(currentScreen, label = "Tab indicator")
-    val indicatorLeft by transition.animateDp(transitionSpec = { spring(stiffness = Spring.StiffnessVeryLow)}, label = "Indicator left") { page ->
+    val indicatorLeft by transition.animateDp(transitionSpec = {
+        if (ans) {
+            spring(stiffness = Spring.StiffnessVeryLow)
+        } else {
+            spring(stiffness = Spring.StiffnessMedium)
+        }
+    }, label = "Indicator left") { page ->
         tabPositions[page.ordinal].left
     }
-    val indicatorRight by transition.animateDp(transitionSpec = { spring(stiffness = Spring.StiffnessVeryLow)}, label = "Indicator right") { page ->
+    val indicatorRight by transition.animateDp(transitionSpec = {
+        if (ans) {
+            spring(stiffness = Spring.StiffnessMedium)
+        } else {
+            spring(stiffness = Spring.StiffnessVeryLow)
+        }
+    }, label = "Indicator right") { page ->
         tabPositions[page.ordinal].right
     }
+
+    TextDestination.old_route = currentScreen.ordinal
 
     Box(
         modifier = Modifier
 //            .fillMaxSize()
 //            .wrapContentWidth(Alignment.Start)
-            .height(50.dp)
+            .height(TabHeight)
             .offset(x = indicatorLeft)
             .width(indicatorRight - indicatorLeft)
 //            .background(Color.Transparent)
@@ -181,19 +141,26 @@ fun TextTabIndicator(
 fun TextTabIndicator2() {
     Box(
         modifier = Modifier
-            .wrapContentWidth(Alignment.End)
-            .size(50.dp)
-            .background(Color.Transparent)
-            .border(2.dp, Color.Cyan),
+//            .fillMaxWidth()
+//            .wrapContentWidth(Alignment.End)
+            .width(20.dp)
+            .height(TabHeight)
+            .background(Brush.horizontalGradient(listOf(Color.Transparent, Color.White))),
+//            .border(1.dp, Color.Cyan),
         contentAlignment = Alignment.BottomEnd,
     ) {
-        Text(text = "ME", color = Color.Black)
+//        Text(text = "ME", color = Color.Black)
     }
 }
 
 @Composable
 fun Chosenes(){
-    Text(text = "第一页")
+    Surface(
+        color = Color.White,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(text = "第一页")
+    }
 }
 
 @Composable
@@ -222,6 +189,6 @@ fun MyTabPreview(){
 }
 
 
-private val TabHeight2 = 56.dp
-private val TabWidth2 = 300.dp
+//private val TabHeight2 = 56.dp
+//private val TabWidth2 = 300.dp
 
