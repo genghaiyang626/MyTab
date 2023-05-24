@@ -40,7 +40,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
+                Surface(
+                    color = Color.Yellow
+                ) {
                     Id_sliding_tab()
+                }
             }
         }
     }

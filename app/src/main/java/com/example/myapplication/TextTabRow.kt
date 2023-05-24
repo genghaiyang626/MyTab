@@ -1,7 +1,11 @@
 package com.example.myapplication
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -26,7 +30,7 @@ fun TextTabRow(
 
     Surface(
         color = Color.White,
-        contentColor = Color.Yellow,
+        contentColor = Color.White,
         modifier = Modifier
             .scrollable(scrollState,Orientation.Horizontal, reverseDirection = true)
     ) {
@@ -38,6 +42,15 @@ fun TextTabRow(
                     selected = currentScreen == screen
                 )
             }
+        }
+
+        val bgBox = @Composable{
+            Box(
+                modifier = Modifier
+                    .background(Color.White)
+                    .width(300.dp)
+                    .height(56.dp)
+            )
         }
 
         SubcomposeLayout(){
@@ -63,6 +76,11 @@ fun TextTabRow(
                 placeable
             }
 
+            val bgBoxPlaceable = subcompose("bgBox",bgBox).map {
+                val placeable = it.measure(constraints)
+                placeable
+            }
+
             val totalHeight = 56.dp.roundToPx()
             val totalWidth = 300.dp.roundToPx() // left.coerceAtMost(300.dp.roundToPx())
             val paddingWidth = 10.dp.roundToPx()
@@ -83,6 +101,10 @@ fun TextTabRow(
              xOffset = -scroll
 
             layout(totalWidth, totalHeight){
+
+                bgBoxPlaceable.forEach{
+                    it.placeRelative(0, 0)
+                }
 
                 indicatorPlaceable.forEach {
                     it.placeRelative(paddingWidth+xOffset, 0)
