@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="show_less">showless</string>
+    <string name="show_more">showmore</string>
+    <string name="ElevatedButton">ElevatedButton</string>
+    <string name="Button">Button</string>
+    <string name="FilledTonalButton">FilledTonalButton</string>
+    <string name="OutlinedButton">OutlinedButton</string>
+    <string name="TextButton">TextButton</string>
+</resources>

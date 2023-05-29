@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
@@ -19,6 +20,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -33,6 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Id_sliding_tab(modifier: Modifier=Modifier){
@@ -43,16 +48,23 @@ fun Id_sliding_tab(modifier: Modifier=Modifier){
 
     val currentScreen = TextTabRowScreens.find { it.route == currentDestination?.route } ?: Chosen
 
+//    var cs by rememberSaveable{ mutableStateOf(currentScreen)}
+
+
+//    var cS = remember { mutableStateOf(Chosen) }
+//
+//    cS.value = ((TextTabRowScreens.find { it.route == currentDestination?.route } ?: Chosen) as Chosen)
+
+
 
     Scaffold(
         topBar = {
             TextTabRow(
                 allScreens = TextTabRowScreens,
                 onTabSelected = { newScreen ->
-                    navController
-                        .navigateSingleTopTo(newScreen.route)
+                    navController.navigateSingleTopTo(newScreen.route)
                 },
-                currentScreen =currentScreen,
+                currentScreen = currentScreen,
                 indicator = { tabPositions -> TextTabIndicator(tabPositions,currentScreen) },
                 indicator2 = { TextTabIndicator2() },
             )
@@ -99,7 +111,7 @@ fun TextTabIndicator(
     tabPositions: List<TabPosition>,
     currentScreen: TextDestination
 ) {
-    val ans:Boolean = currentScreen.ordinal > TextDestination.old_route
+    val ans:Boolean = currentScreen.ordinal > TextDestination.old_ordinal
     val transition = updateTransition(currentScreen, label = "Tab indicator")
     val indicatorLeft by transition.animateDp(transitionSpec = {
         if (ans) {
@@ -120,7 +132,7 @@ fun TextTabIndicator(
         tabPositions[page.ordinal].right
     }
 
-    TextDestination.old_route = currentScreen.ordinal
+    TextDestination.old_ordinal = currentScreen.ordinal
 
     Box(
         modifier = Modifier

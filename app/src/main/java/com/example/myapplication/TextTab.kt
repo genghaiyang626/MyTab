@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -52,17 +54,17 @@ fun TextTab(
             modifier = Modifier
                 .height(TabHeight)
                 .width(boxwidth(text.length))
-                .selectable(
-                    selected = selected,
-                    onClick = onSelected,
-//                    role = Role.Tab
-                )
+//                .selectable(
+//                    selected = selected,
+//                    onClick = onSelected,
+////                    role = Role.Tab
+//                )
 
         ) {
             if (selected) {
                 Text(
                     text, fontWeight = FontWeight.ExtraBold,
-                    fontSize = 18.sp, color = Color.Black,
+                    fontSize = 18.sp, color = Color.Black, modifier = Modifier.clickable(enabled = true,onClick = onSelected,onClickLabel= "选中")
                 )
             } else {
                 val colorStops = arrayOf(
@@ -78,7 +80,7 @@ fun TextTab(
                         brush = Brush.horizontalGradient(colorStops = colorStops),
                         alpha = 0.6f
                     ),
-
+                    modifier = Modifier.clickable(enabled = true,onClick = onSelected,onClickLabel= "没选中")
                 )
             }
         }

@@ -5,7 +5,7 @@ interface TextDestination {
     val ordinal: Int
 
     companion object {
-         var old_route:Int = 0
+          var old_ordinal:Int = 0
     }
 }
 

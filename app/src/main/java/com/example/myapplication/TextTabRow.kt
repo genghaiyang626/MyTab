@@ -1,20 +1,22 @@
 package com.example.myapplication
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.log
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -25,8 +27,24 @@ fun TextTabRow(
     indicator:@Composable (tabPositions: List<TabPosition>) -> Unit ={},
     indicator2:@Composable () -> Unit ={},
 ) {
+    var scrollValue by rememberSaveable{ mutableStateOf(0.0f) }
 
-    val scrollState = rememberScrollState()
+    if (currentScreen.ordinal != TextDestination.old_ordinal){
+        scrollValue = when(currentScreen.ordinal){
+            3 -> 100.0f
+            4 -> 200.0f
+            5 -> 300f
+            6 -> 400f
+            7 -> 400f
+            else -> 0.0f
+        }
+//        Log.e("测试","是否执行")
+    }
+    val scrollState = rememberScrollableState{
+            delta ->
+         scrollValue+=delta
+        delta
+    }
 
     Surface(
         color = Color.White,
@@ -42,15 +60,6 @@ fun TextTabRow(
                     selected = currentScreen == screen
                 )
             }
-        }
-
-        val bgBox = @Composable{
-            Box(
-                modifier = Modifier
-                    .background(Color.White)
-                    .width(300.dp)
-                    .height(56.dp)
-            )
         }
 
         SubcomposeLayout(){
@@ -76,36 +85,17 @@ fun TextTabRow(
                 placeable
             }
 
-            val bgBoxPlaceable = subcompose("bgBox",bgBox).map {
-                val placeable = it.measure(constraints)
-                placeable
-            }
-
             val totalHeight = 56.dp.roundToPx()
             val totalWidth = 300.dp.roundToPx() // left.coerceAtMost(300.dp.roundToPx())
             val paddingWidth = 10.dp.roundToPx()
 
-            var xOffset = 0
-            //居中
-//            xOffset = if(tabPositions[currentScreen.ordinal].left < 150.dp){
-//                -scroll
-//            }else if (tabPositions[currentScreen.ordinal].left.roundToPx() <= 200 +paddingWidth ){
-//                150- tabPositions[currentScreen.ordinal].left.roundToPx()
-//            }else{
-//                -scroll
-//            }
-
             // 根据可滚动的距离来计算滚动位置
-            val scroll = scrollState.value.coerceIn(0, left-totalWidth+paddingWidth*2)
+            val scroll = scrollValue.coerceIn(0F, (left-totalWidth+paddingWidth*2).toFloat()).toInt()
+
             // 根据滚动位置得到实际组件偏移量
-             xOffset = -scroll
+            val xOffset  = -scroll
 
             layout(totalWidth, totalHeight){
-
-                bgBoxPlaceable.forEach{
-                    it.placeRelative(0, 0)
-                }
-
                 indicatorPlaceable.forEach {
                     it.placeRelative(paddingWidth+xOffset, 0)
                 }
